@@ -1,11 +1,11 @@
-data_dir = "/home/yorajend/nomad-server/consul/deploy"
+data_dir = "/opt/nomad-server/consul/deploy"
 datacenter = "dc1"
 
 server = true
 bootstrap_expect = 1
 
-bind_addr = "172.27.0.1"
-advertise_addr = "172.27.0.1"
+bind_addr = "0.0.0.0"
+advertise_addr = "0.0.0.0"
 
 enable_debug = true
 

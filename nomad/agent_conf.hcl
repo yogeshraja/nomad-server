@@ -1,4 +1,4 @@
-data_dir  = "/home/yorajend/nomad-server/nomad/deploy"
+data_dir  = "/opt/nomad-server/nomad/deploy"
 
 bind_addr = "0.0.0.0" # the default
 
@@ -10,7 +10,7 @@ server {
 client {
   enabled       = true
   host_volume "local-volume" {
-    path      = "/home/yorajend/nomad-server/nomad_volumes/local-volume"
+    path      = "/opt/nomad-server/nomad_volumes/local-volume"
     read_only = false
   }
   
