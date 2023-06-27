@@ -1,0 +1,108 @@
+#!/bin/bash
+### BEGIN INIT INFO
+# Provides:
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: nomad server startup
+# Description:       Nomad server startup script
+### END INIT INFO
+
+# Author: Yogeshwaran Rajendran
+#
+
+#set -e
+
+# PATH should only include /usr/* if it runs after the mountnfs.sh script
+# PATH=/sbin:/usr/sbin:/bin:/usr/bin
+SCRIPT_PATH="/opt/nomad-server/scripts"
+NAME=nomadserver
+LOGPATH="/var/log/${NAME}"
+PIDPATH="/var/run/${NAME}"
+PIDFILE="${PIDPATH}/${NAME}.pid"
+SCRIPTFILE="${SCRIPT_PATH}/nomad-server.sh"
+USER_NAME=${SUDO_USER}
+
+# Read configuration variable file if it is present
+[[ -f "/etc/default/${NAME}" ]] && . "/etc/default/nomadserver"
+
+# Load the VERBOSE setting and other rcS variables
+# . /lib/init/vars.sh
+
+# Define LSB log_* functions.
+# Depend on lsb-base (>= 3.0-6) to ensure that this file is present.
+# . /lib/lsb/init-functions
+
+#
+# Function that starts the daemon/service
+#
+do_start() {
+	mkdir -p "${PIDPATH}"
+	# Start docker service
+	echo "Starting Docker service"
+	service docker status >/dev/null || service docker start
+
+	# Start consul server
+	echo "Starting Consul server ........"
+	consul agent -dev -config-file "/opt/nomad-server/consul/agent_conf.hcl" >>"${LOGPATH}/consul.log" &
+	echo "$!" | tee -a "${PIDFILE}" &>>"${PIDPATH}/consul.pid"
+	sleep 10
+
+	# Start nomad server
+	echo "Starting Nomad server ........"
+	nomad agent -config "/opt/nomad-server/nomad/agent_conf.hcl" &>>"${LOGPATH}/nomad.log" &
+	echo "$!" | tee -a "${PIDFILE}" >>"${PIDPATH}/nomad.pid"
+	sleep 10
+
+	bash "${SCRIPTFILE}" "${USER_NAME}" &>>"${LOGPATH}/scriptfile.log"
+	return 0
+}
+
+#
+# Function that stops the daemon/service
+#
+do_stop() {
+	xargs <"${PIDFILE}" kill || true
+	rm -rf "${PIDPATH}"
+	service nomad stop
+	service consul stop
+	return 0
+}
+
+#
+# Function that sends a SIGHUP to the daemon/service
+#
+do_reload() {
+	do_start
+	do_stop
+	return 0
+}
+
+case "$1" in
+start)
+	do_start
+	;;
+stop)
+	do_stop
+	;;
+	#reload|force-reload)
+	#
+	# If do_reload() is not implemented then leave this commented out
+	# and leave 'force-reload' as an alias for 'restart'.
+	#
+	#log_daemon_msg "Reloading $DESC" "$NAME"
+	#do_reload
+	#log_end_msg $?
+	#;;
+restart | force-reload)
+	#
+	# If the "reload" option is implemented then remove the
+	# 'force-reload' alias
+	#
+	do_reload
+	;;
+*)
+	#echo "Usage: $SCRIPTNAME {start|stop|restart|reload|force-reload}" >&2
+	echo "Usage: ${SCRIPTNAME} {start|stop|restart|force-reload}" >&2
+	exit 3
+	;;
+esac

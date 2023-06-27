@@ -1,0 +1,21 @@
+version: '3'
+services: 
+  grafana: 
+    image: grafana/grafana:latest 
+    volumes: 
+      - /home/${USER}/nomad/grafana:/var/grafana
+    network_mode: host 
+  prometheus: 
+    image: prom/prometheus:latest
+    volumes: 
+      - /home/${USER}/nomad/prometheus:/var/prometheus
+      - /etc/ssl/certs/ca-certificates.crt:/etc/ssl/certs/ca-certificates.crt
+    command: 
+      - '--config.file=/var/prometheus/prometheus-config.yml' 
+    network_mode: host 
+  consul: 
+    image: consul:latest 
+    command: "consul agent -config-file=/consul/config/consul.hcl" 
+    volumes: 
+      - ./consul.hcl:/consul/config/consul.hcl 
+    network_mode: host
