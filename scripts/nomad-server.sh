@@ -1,12 +1,12 @@
 #!/bin/bash
 SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 USER_NAME="${1}"
-NAME=nomadserver
-LOGPATH=/var/log/$NAME
-PIDPATH=/var/run/$NAME
-PIDFILE=$PIDPATH/$NAME.pid
+NAME="nomadserver"
+LOGPATH="/var/log/${NAME}"
+PIDPATH="/var/run/${NAME}"
+PIDFILE="${PIDPATH}/${NAME}.pid"
 
-cd "$SCRIPT_DIR/nomad/terraform"
+cd "/opt/nomad-server/nomad/terraform"
 #################################################################
 #                   TERRAFORM COMMANDS                          #
 ################################################################

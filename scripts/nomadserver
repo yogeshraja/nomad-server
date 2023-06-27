@@ -14,7 +14,7 @@
 
 # PATH should only include /usr/* if it runs after the mountnfs.sh script
 # PATH=/sbin:/usr/sbin:/bin:/usr/bin
-SCRIPT_PATH=
+SCRIPT_PATH="/opt/nomad-server/scripts"
 NAME=nomadserver
 LOGPATH="/var/log/${NAME}"
 PIDPATH="/var/run/${NAME}"
@@ -49,11 +49,11 @@ do_start() {
 
 	# Start nomad server
 	echo "Starting Nomad server ........"
-	nomad agent -config "/home/${USER_NAME}/nomad-server/nomad/agent_conf.hcl" &>>"${LOGPATH}/nomad.log" &
+	nomad agent -config "/opt/nomad-server/nomad/agent_conf.hcl" &>>"${LOGPATH}/nomad.log" &
 	echo "$!" | tee -a "${PIDFILE}" >>"${PIDPATH}/nomad.pid"
 	sleep 10
 
-	bash "${SCRIPTFILE} ${USER_NAME}" &>>"${LOGPATH}/scriptfile.log"
+	bash "${SCRIPTFILE}" "${USER_NAME}" &>>"${LOGPATH}/scriptfile.log"
 	return 0
 }
 

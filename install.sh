@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 {
-
+NAME="nomadserver"
 GIT_REPO_URL="https://github.com/yogeshraja/nomad-server.git"
 GIT_SSH_URL="git@github.com:yogeshraja/nomad-server.git"
 INSTALL_DIR="/opt/nomad-server"
@@ -15,6 +15,7 @@ term_echo() {
 }
 
 check_dependency() {
+    term_echo "Checking dependencies ...."
     dependencies=("nomad" "consul" "docker" "git")
     for dependency in "${dependencies[@]}"; do
         if ! if_has "${dependency}"; then
@@ -24,19 +25,24 @@ check_dependency() {
     done
 }
 
-elevate_to_root() {
+check_root() {
+    term_echo "Checking root access ...."
     local uid
     uid="$(id -u)"
+    term_echo "User id : ${uid}"
     if ! [[ ${uid} == 0 ]]; then
-        sudo su root
+        term_echo "Seems like you are not root"
+        term_echo "please run the command with sudo"
+        exit 1
     fi
 }
 
 create_required_folders() {
-    term_echo "Creating folders for installing the service"
+    term_echo "Creating folders for installing the service ...."
     mkdir -p "${INSTALL_DIR}"                            # Create nomad server
     mkdir -p "${INSTALL_DIR}/nomad/deploy"               # Nomad data dir
     mkdir -p "${INSTALL_DIR}/nomad_volumes/local-volume" # Dir for nomad volumes
+    mkdir -p "/var/log/nomadserver"                      # Dir for service logs
 }
 
 clone_using_git() {
@@ -44,6 +50,7 @@ clone_using_git() {
 }
 
 install_service() {
+    term_echo "Installing nomadserver service ...."
     cp "${INSTALL_DIR}/scripts/${NAME}" "/etc/init.d/"
     chmod 751 "/etc/init.d/${NAME}"
     update-rc.d nomadserver defaults
@@ -53,6 +60,7 @@ EOF
 }
 
 own_folders_recursively() {
+    term_echo "Changing ownership of all files and directories in /opt/nomadserver ...."
     chown -R "${SUDO_USER}" "${INSTALL_DIR}"
 }
 
@@ -62,9 +70,9 @@ start_service(){
 
 do_install() {
     check_dependency
-    elevate_to_root
-    create_required_folders
+    check_root
     clone_using_git
+    create_required_folders
     install_service
     own_folders_recursively
     start_service
