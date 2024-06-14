@@ -51,7 +51,7 @@ clone_using_git() {
 
 install_service() {
     term_echo "Installing nomadserver service ...."
-    cp "${INSTALL_DIR}/scripts/${NAME}" "/etc/init.d/"
+    cp -f "${INSTALL_DIR}/scripts/${NAME}" "/etc/init.d/"
     chmod 751 "/etc/init.d/${NAME}"
     update-rc.d nomadserver defaults
     cat <<EOF >>"/etc/default/${NAME}"

@@ -1,12 +1,9 @@
 data_dir = "/opt/nomad-server/consul/deploy"
-datacenter = "dc1"
-
 server = true
+bootstrap = true
 bootstrap_expect = 1
 
-bind_addr = "0.0.0.0"
-advertise_addr = "0.0.0.0"
-
+datacenter = "dc1"
 enable_debug = true
 
 client_addr = "0.0.0.0"
@@ -19,4 +16,8 @@ ui_config {
 
 acl{
   enabled = true
+}
+
+addresses {
+  http = "0.0.0.0"
 }

@@ -43,7 +43,7 @@ do_start() {
 
 	# Start consul server
 	echo "Starting Consul server ........"
-	consul agent -dev >>"${LOGPATH}/consul.log" &
+	consul agent -dev -config-file "/opt/nomad-server/consul/agent_conf.hcl" >>"${LOGPATH}/consul.log" &
 	echo "$!" | tee -a "${PIDFILE}" &>>"${PIDPATH}/consul.pid"
 	sleep 10
 
@@ -63,6 +63,8 @@ do_start() {
 do_stop() {
 	xargs <"${PIDFILE}" kill || true
 	rm -rf "${PIDPATH}"
+	service nomad stop
+	service consul stop
 	return 0
 }
 

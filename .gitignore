@@ -1,6 +1,7 @@
 .vscode/*
 nomad_volumes/*
 nomad/deploy/*
+consul/deploy/*
 repos/*
 **/.terraform/*
 *.tfstate
