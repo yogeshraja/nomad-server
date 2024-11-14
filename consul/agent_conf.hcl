@@ -1,6 +1,5 @@
 data_dir = "/opt/nomad-server/consul/deploy"
 server = true
-bootstrap = true
 bootstrap_expect = 1
 
 datacenter = "dc1"

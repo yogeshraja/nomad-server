@@ -7,6 +7,15 @@ server {
   bootstrap_expect = 1
 }
 
+limits {
+  http_max_conns_per_client = 400
+}
+
+
+acl{
+  enabled = true
+}
+
 client {
   enabled       = true
   host_volume "local-volume" {
@@ -29,9 +38,19 @@ plugin "raw_exec" {
 plugin "docker" {
   config {
     allow_privileged = true
+    volumes {
+      enabled = true
+    }
   }
 }
 
 consul {
   address = "0.0.0.0:8500"
+}
+
+telemetry {
+  collection_interval        = "10s"
+  prometheus_metrics         = true
+  publish_allocation_metrics = true
+  publish_node_metrics       = true
 }
